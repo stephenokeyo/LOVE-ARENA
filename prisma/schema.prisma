@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  age       Int
+  gender    String
+  bio       String?
+  photo     String?
+  country   String?
+  phone     String?
+  isAdmin   Boolean  @default(false)
+  preferences Preferences? @relation("preferences")
+  likesSent Like[] @relation("likesFrom")
+  likesReceived Like[] @relation("likesTo")
+  matches1 Match[] @relation("matches1")
+  matches2 Match[] @relation("matches2")
+  messages Message[] @relation("messagesFrom")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Preferences {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation("preferences", fields: [userId], references: [id])
+  minAge Int    @default(18)
+  maxAge Int    @default(99)
+  gender String
+}
+
+model Like {
+  id     String @id @default(cuid())
+  fromId String
+  from   User   @relation("likesFrom", fields: [fromId], references: [id])
+  toId   String
+  to     User   @relation("likesTo", fields: [toId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([fromId, toId])
+}
+
+model Match {
+  id     String @id @default(cuid())
+  user1Id String
+  user1  User   @relation("matches1", fields: [user1Id], references: [id])
+  user2Id String
+  user2  User   @relation("matches2", fields: [user2Id], references: [id])
+  createdAt DateTime @default(now())
+  messages Message[] @relation("messages")
+
+  @@unique([user1Id, user2Id])
+}
+
+model Message {
+  id      String @id @default(cuid())
+  matchId String
+  match   Match  @relation("messages", fields: [matchId], references: [id])
+  fromId  String
+  from    User   @relation("messagesFrom", fields: [fromId], references: [id])
+  content String
+  createdAt DateTime @default(now())
+}
