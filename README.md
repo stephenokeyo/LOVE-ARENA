@@ -23,7 +23,7 @@ npx prisma db push
 
 ```
 NEXTAUTH_SECRET=your-secret-key
-NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_URL=http://localhost:3002
 ```
 
 ## Running the App
